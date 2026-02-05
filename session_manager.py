@@ -1,7 +1,7 @@
 import subprocess
 import time
 import os
-from flask import Flask, jsonify, redirect
+from flask import Flask, jsonify, redirect, request
 
 app = Flask(__name__)
 
@@ -39,11 +39,19 @@ def create_session():
     ])
     
     next_display += 1
+
+    # host_name = request.host.split(':')[0]
     
     # Return the URL to the user
     # Note: Replace 'localhost' with your server IP if running remotely
-    # return f"Game started! Access it at: http://localhost:{web_port}/vnc.html"
-    return redirect(f"http://localhost:{web_port}/vnc.html")
+    # return f"Game started! Access it at: http://{host_name}:{web_port}/vnc.html"
+    # return redirect(f"http://{host_name}:{web_port}/vnc.html")
+
+    # We don't change the port in the URL anymore, we change the PATH
+    # The 'vnc.html?path=view/{web_port}/websockify' tells noVNC where to find the stream
+    shareable_url = f"https://{request.host}/view/{web_port}/vnc.html"
+    
+    return redirect(shareable_url)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5010)
